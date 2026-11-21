@@ -35,7 +35,8 @@ client. ACP Reloaded brings it back: a native DirectX 11 overlay that edits all 
 
 ## Install (Windows 10 / 11)
 
-1. Download the latest release and copy **`dinput8.dll`** and **`ACPReloaded.dll`** into the game folder
+1. Download the [latest release](https://github.com/justsomesnake/ACP-Reloaded/releases/latest) (also on
+   [Nexus Mods](https://www.nexusmods.com/assassinscreedorigins/mods/375)) and copy **`dinput8.dll`** and **`ACPReloaded.dll`** into the game folder
    (next to `ACOrigins.exe`).
 2. Start the game and load a "Hacked Animus" save (press **Q** on a save in the load menu).
 3. Open the panel with **Shift+F2** (changeable) or hold **View + Menu** on the controller.
