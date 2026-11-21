@@ -1,0 +1,8 @@
+LIBRARY dinput8
+EXPORTS
+    DirectInput8Create = ACP_DirectInput8Create
+    DllCanUnloadNow = ACP_DllCanUnloadNow PRIVATE
+    DllGetClassObject = ACP_DllGetClassObject PRIVATE
+    DllRegisterServer = ACP_DllRegisterServer PRIVATE
+    DllUnregisterServer = ACP_DllUnregisterServer PRIVATE
+    GetdfDIJoystick = ACP_GetdfDIJoystick

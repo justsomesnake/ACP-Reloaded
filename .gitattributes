@@ -1,0 +1,6 @@
+# Referenzdatei des Spiels byte-genau halten (CRLF, Tests vergleichen Bytes)
+copys/ACP.ini -text
+*.ttf binary
+*.woff2 binary
+*.ico binary
+*.png binary

@@ -1,0 +1,30 @@
+build/
+out/
+.vs/
+*.user
+.claude/settings.local.json
+research_local/
+screenshots/
+branding/_to_delete/
+dist/
+CMakeUserPresets.json
+
+# Local development notes and AI workflow files (not part of the public repository)
+CLAUDE.md
+.claude/
+docs/PLAN.md
+docs/PHASE0_GUIDE.md
+docs/INSTALL.md
+docs/research/
+tools/phase0/
+
+# Branding workspace: only the images used on GitHub are published
+branding/*
+!branding/graphics/
+branding/graphics/*
+!branding/graphics/acp-reloaded_readme-banner_1600x400.png
+!branding/graphics/acp-reloaded_github-social_1280x640.png
+!branding/graphics/acp-reloaded_icon_512.png
+!branding/graphics/acp-reloaded_icon.ico
+!branding/graphics/acp-reloaded_tour.gif
+!branding/graphics/acp-reloaded_kofi_2x.png
