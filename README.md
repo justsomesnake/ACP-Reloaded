@@ -18,7 +18,7 @@ client. ACP Reloaded brings it back: a native DirectX 11 overlay that edits all 
 ![ACP Reloaded feature tour: live ACP editing, character choice, time and weather, teleport, settings, two looks, controller support](branding/graphics/acp-reloaded_tour.gif)
 
 
-- **All 109 ACP parameters**, applied live in a "Hacked Animus" save (no restart). Presets, search, undo,
+- **All 75+ ACP settings** (every value of the game's ACP.ini), applied live in a "Hacked Animus" save (no restart). Presets, search, undo,
   "changed only" filter, reset per value or page.
 - **Two looks:** the classic Uplay panel or an *Origins* theme modelled on the game's menus.
 - **Full controller support** in console style (D-pad/left stick, LB/RB pages, A/B/X/Y), plus keyboard and mouse.

@@ -5,7 +5,7 @@
 First public release.
 
 **Animus Control Panel**
-- All 109 ACP parameters, applied live in a "Hacked Animus" save through the game's own Uplay options event.
+- All 75+ ACP settings (every value of the game's ACP.ini), applied live in a "Hacked Animus" save through the game's own Uplay options event.
 - Presets, search, "changed only" filter, undo (Ctrl+Z / Y), reset per value or page, "Apply now" for values that
   reload the world.
 - Character choice with names and portraits for all 21 ACP characters, overview grid.
