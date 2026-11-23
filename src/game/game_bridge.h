@@ -132,6 +132,8 @@ void SetSpeedBoost(float swimFactor, float mountFactor);
 bool SpeedBoostActive();
 // Round 8 functions verified and ready (for display).
 bool SpeedBoostAvailable();
+// Hide the game's ACP watermark text (colour 0); false restores it. Applied in OnPreStep while the game functions run.
+void SetHideWatermark(bool hide);
 // Unloading: have all factors reset to 1 and accept no new requests.
 void ReleaseSpeedBoost();
 // Result of the last action (empty text = none yet). seq counts up.

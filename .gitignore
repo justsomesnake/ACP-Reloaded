@@ -28,3 +28,6 @@ branding/graphics/*
 !branding/graphics/acp-reloaded_icon.ico
 !branding/graphics/acp-reloaded_tour.gif
 !branding/graphics/acp-reloaded_kofi_2x.png
+
+# Local backup of game files (never publish)
+game_backup/

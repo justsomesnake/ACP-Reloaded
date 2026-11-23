@@ -32,6 +32,7 @@ client. ACP Reloaded brings it back: a native DirectX 11 overlay that edits all 
   - control the weather
   - teleport to your map marker or the tracked quest target (also from the world map), water surface landing
   - extra speed for surface swimming and your own horse/camel
+  - hide the game's ACP watermark for clean screenshots
 
 ## Install (Windows 10 / 11)
 

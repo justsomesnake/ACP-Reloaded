@@ -42,6 +42,7 @@ struct UiSettings {
     std::uint32_t tpQuickKey = 0;        // optional key (same format as toggleKey), 0 = off (F3 and L3+R3 = game's photo mode)
     int swimBoost = 100;         // experimental: time scale of the player character while surface swimming (100..200 %)
     int mountBoost = 100;        // experimental: time scale of the player's mount (100..200 %)
+    bool hideWatermark = false;  // hide the game's ACP watermark text (needs the game functions)
     float TeleportRange() const { return tpRange == 2 ? 30000.0f : tpRange == 1 ? 2000.0f : 300.0f; }  // range in metres for the current setting
     std::uint32_t toggleKey = kDefaultToggleKey;  // VK | Shift<<16 | Ctrl<<17 | Alt<<18
     static constexpr std::uint32_t kDefaultToggleKey = 0x10071;  // Shift+F2 (like the Uplay overlay)

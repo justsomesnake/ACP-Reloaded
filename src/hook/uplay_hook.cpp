@@ -446,7 +446,7 @@ void UplayDrainLog() {
     }
     const std::uint64_t now = GetTickCount64();
     if (g_hooked && now >= nextStats) {
-        nextStats = now + 60000;
+        nextStats = now + 600000;  // every 10 minutes (keeps the log small)
         char line[160];
         std::snprintf(line, sizeof(line), "UPLAY stats: GetNextEvent %llu calls, %llu events, %llu injected, state %d",
                       static_cast<unsigned long long>(g_calls.load()), static_cast<unsigned long long>(g_hits.load()),

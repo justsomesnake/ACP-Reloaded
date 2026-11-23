@@ -400,6 +400,7 @@ void OnPresent(IDXGISwapChain* sc) {
         std::lock_guard lock(G().ctxMutex);
         rt->panel->Update();
         game::SetEnabled(rt->panel->Settings().gameFunctions);
+        game::SetHideWatermark(rt->panel->Settings().gameFunctions && rt->panel->Settings().hideWatermark);
         game::SetTeleportEnabled(rt->panel->Settings().gameFunctions && rt->panel->Settings().teleport);
         game::SetTeleportMaxDistance(rt->panel->Settings().TeleportRange());
         game::SetTeleportOptions(rt->panel->Settings().tpAllowCombat, rt->panel->Settings().tpAllowMounted);

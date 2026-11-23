@@ -1,4 +1,4 @@
-ACP Reloaded 1.0.0-beta – Animus Control Panel for Assassin's Creed Origins (PC)
+ACP Reloaded 1.0.1-beta – Animus Control Panel for Assassin's Creed Origins (PC)
 ===============================================================================
 
 Brings back the removed Animus Control Panel as an in-game overlay: live editing in a
@@ -56,6 +56,10 @@ KNOWN BEHAVIOUR
   horse/camel faster, so it looks fast-forwarded. Reset to normal when you stop swimming, dismount or switch it off.
 - Teleport while on a boat: you are moved alone, the boat stays where it was (like getting off). Horses and
   camels come along when "Allow while mounted" is on.
+- Screenshots: Settings > "Hide the ACP watermark" removes the faint ACP text the game shows in a "Hacked Animus"
+  save (in play and in photo mode). Achievements, saves and values are not affected.
+- The log (Documents\Assassin's Creed Origins\ACP_Reloaded\ACPReloaded.log) is capped at 1 MB and shows
+  %USERPROFILE% instead of your user name.
 
 ACP Reloaded is and stays free. If it helped you: https://ko-fi.com/mythenstudios - thank you!
 

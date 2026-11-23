@@ -1035,6 +1035,69 @@ bool SehTpPlace(std::uintptr_t player, float x, float y, float z, bool mounted =
 }
 
 // The world's pause counter (map, menus). Read only.
+// --- Analysis round 11: hide the game's ACP watermark text (opt-in) ---
+// The game draws a faint text in a Hacked Animus save through two render elements: one in play (registered render
+// pass "ACP Watermark") and one per view for photo mode (inside the post effect manager). Hiding sets their text
+// colour to 0; nothing but the text draw reads it. Elements are looked up on every pass (no stored pointers) and only
+// written after their vtable (and for W1 the pass name) matched.
+constexpr std::uintptr_t kWmRegistry = 0x49DF5C0;   // render pass registry (entries of 20h, instance at +20h)
+constexpr std::uintptr_t kWmIndex = 0x4C2EFFC;      // u32 registry index of "ACP Watermark"
+constexpr std::uintptr_t kWmVtblW1 = 0x36AA6F8;
+constexpr std::uintptr_t kWmNameW1 = 0x36AA718;
+constexpr std::uintptr_t kWmViewMgr = 0x4A69EC8;    // view manager: instance list at +10h, count u32 at +18h
+constexpr std::uintptr_t kWmVtblPost = 0x36AFDE0;   // post effect manager: element list at +78h, count [+80h] >> 17
+constexpr std::uintptr_t kWmVtblW2 = 0x36B0728;
+
+std::atomic<bool> g_wmHide{false};
+std::atomic<bool> g_wmHidden{false};
+float g_wmOrig[4] = {1.0f, 0.84f, 0.65f, 0.1f};  // the game's colour; replaced by the value read before hiding
+
+void WmApplyOne(std::uintptr_t colour, bool hide, bool* anyHidden) {
+    float* c = reinterpret_cast<float*>(colour);
+    const bool zero = c[0] == 0.0f && c[1] == 0.0f && c[2] == 0.0f && c[3] == 0.0f;
+    if (hide && !zero) {
+        if (c[3] > 0.0f && c[3] < 1.0f)
+            for (int i = 0; i < 4; ++i) g_wmOrig[i] = c[i];
+        for (int i = 0; i < 4; ++i) c[i] = 0.0f;
+        *anyHidden = true;
+    } else if (!hide && zero) {
+        for (int i = 0; i < 4; ++i) c[i] = g_wmOrig[i];
+    } else if (zero) {
+        *anyHidden = true;
+    }
+}
+
+// Returns true while any element is hidden.
+bool SehWmApply(bool hide) {
+    bool anyHidden = false;
+    __try {
+        const std::uint32_t idx = *reinterpret_cast<const std::uint32_t*>(g_base + kWmIndex);
+        if (idx < *reinterpret_cast<const std::uint32_t*>(g_base + kWmRegistry) && idx < 4096) {
+            const auto w1 = *reinterpret_cast<const std::uintptr_t*>(g_base + kWmRegistry + idx * 0x20 + 0x20);
+            if (w1 && *reinterpret_cast<const std::uintptr_t*>(w1) == g_base + kWmVtblW1 &&
+                *reinterpret_cast<const std::uintptr_t*>(w1 + 8) == g_base + kWmNameW1)
+                WmApplyOne(w1 + 0x60, hide, &anyHidden);
+        }
+        if (const auto m = *reinterpret_cast<const std::uintptr_t*>(g_base + kWmViewMgr)) {
+            const auto list = *reinterpret_cast<const std::uintptr_t*>(m + 0x10);
+            const std::uint32_t n = *reinterpret_cast<const std::uint32_t*>(m + 0x18);
+            for (std::uint32_t i = 0; list && i < n && i < 4096; ++i) {
+                const auto o = *reinterpret_cast<const std::uintptr_t*>(list + i * 8);
+                if (!o || *reinterpret_cast<const std::uintptr_t*>(o) != g_base + kWmVtblPost) continue;
+                const auto arr = *reinterpret_cast<const std::uintptr_t*>(o + 0x78);
+                const std::uint32_t cnt = *reinterpret_cast<const std::uint32_t*>(o + 0x80) >> 17;
+                for (std::uint32_t k = 0; arr && k < cnt && k < 64; ++k) {
+                    const auto e = *reinterpret_cast<const std::uintptr_t*>(arr + k * 8);
+                    if (e && *reinterpret_cast<const std::uintptr_t*>(e) == g_base + kWmVtblW2) WmApplyOne(e + 0x30, hide, &anyHidden);
+                }
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return anyHidden;
+    }
+    return anyHidden;
+}
+
 bool SehWorldPaused() {
     __try {
         const auto world = reinterpret_cast<std::uintptr_t>(g_fn.getWorld());
@@ -1540,6 +1603,15 @@ void LifecycleTick(bool acpActive, bool anyHost) {
 void OnPreStep(bool acpActive) noexcept {
     if (g_state.load(std::memory_order_acquire) != BridgeState::Ready || g_faulted.load(std::memory_order_relaxed)) return;
     const std::uint64_t now = GetTickCount64();
+    {
+        // Watermark: re-checked twice a second (the game may rebuild the elements, e.g. on a resolution change)
+        static std::uint64_t nextWm = 0;
+        const bool hide = g_wmHide.load(std::memory_order_relaxed) && g_enabled.load(std::memory_order_relaxed);
+        if ((hide || g_wmHidden.load(std::memory_order_relaxed)) && now >= nextWm) {
+            nextWm = now + 500;
+            g_wmHidden.store(SehWmApply(hide));
+        }
+    }
     const bool speedOk = acpActive && g_extState.load() == 1 && g_tpState.load() == 1;
     if (!g_enabled.load(std::memory_order_relaxed)) {
         // Game functions turned off: only reset time scales that are still set
@@ -1692,12 +1764,18 @@ void SetSpeedBoost(float swimFactor, float mountFactor) {
 
 bool GamePausedNow() { return g_paused.load() && GetTickCount64() - g_pausedTick.load() < 500; }
 
-bool SpeedBoostActive() { return g_tsActive.load(); }
+bool SpeedBoostActive() { return g_tsActive.load() || g_wmHidden.load(); }  // unloading also waits for the watermark
+
+void SetHideWatermark(bool hide) {
+    if (g_tsShutdown.load()) hide = false;
+    if (g_wmHide.exchange(hide) != hide) platform::log::Write(hide ? "ACP watermark: hidden" : "ACP watermark: shown");
+}
 
 bool SpeedBoostAvailable() { return g_state.load() == BridgeState::Ready && g_extState.load() == 1 && g_tpState.load() == 1; }
 
 void ReleaseSpeedBoost() {
     g_tsShutdown.store(true);
+    g_wmHide.store(false);  // restore the watermark colour before unloading
     g_swimScale.store(1.0f);
     g_mountScale.store(1.0f);
 }

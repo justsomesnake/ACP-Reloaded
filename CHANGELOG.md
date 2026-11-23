@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1-beta
+
+**New**
+- Hide the ACP watermark (Settings, with the game functions on): hides the faint ACP text the game shows in a
+  "Hacked Animus" save, in play and in photo mode - for clean screenshots. Only changes how that text is drawn;
+  achievements, saves and ACP values are not affected. Turning it off or unloading the overlay brings it back.
+
+**Fixes**
+- The log file no longer grows without limit: at 1 MB it is renamed to `ACPReloaded.old.log` (one old file kept).
+- Paths in the log show `%USERPROFILE%` instead of your Windows user name, so a log can be shared safely.
+- Fewer routine lines in the log (Uplay statistics every 10 minutes).
+
 ## 1.0.0-beta
 
 First public release.

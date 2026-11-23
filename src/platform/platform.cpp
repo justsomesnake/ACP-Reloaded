@@ -240,11 +240,34 @@ namespace {
 std::mutex g_mutex;
 std::string g_buffer;
 fs::path g_file;
+std::string g_profile;  // user profile path (UTF-8), masked in log lines so shared logs don't reveal the user name
+constexpr std::uintmax_t kMaxLogBytes = 1u << 20;
+
+void MaskProfile(std::string& line) {
+    if (g_profile.size() < 4) return;
+    for (std::size_t pos = 0; (pos = line.find(g_profile, pos)) != std::string::npos;) {
+        line.replace(pos, g_profile.size(), "%USERPROFILE%");
+        pos += 13;
+    }
+}
 }  // namespace
 
 void SetFile(const fs::path& path) {
+    // Keep the log small: over 1 MB at start-up it becomes <name>.old.log (one generation is kept)
+    std::error_code ec;
+    if (fs::exists(path, ec) && fs::file_size(path, ec) > kMaxLogBytes && !ec) {
+        fs::path old = path;
+        old.replace_extension(L".old.log");
+        fs::remove(old, ec);
+        fs::rename(path, old, ec);
+    }
+    PWSTR raw = nullptr;
+    std::string profile;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_DEFAULT, nullptr, &raw)) && raw) profile = Narrow(raw);
+    if (raw) CoTaskMemFree(raw);
     std::lock_guard lock(g_mutex);
     g_file = path;
+    g_profile = profile;
 }
 
 void Write(std::string_view line) {
@@ -254,8 +277,10 @@ void Write(std::string_view line) {
     std::snprintf(stamp, sizeof(stamp), "%02u:%02u:%02u.%03u  ", st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
     std::lock_guard lock(g_mutex);
     if (g_buffer.size() > (1u << 20)) return;  // guard against unbounded growth
+    std::string text(line);
+    MaskProfile(text);
     g_buffer += stamp;
-    g_buffer += line;
+    g_buffer += text;
     g_buffer += "\r\n";
 }
 

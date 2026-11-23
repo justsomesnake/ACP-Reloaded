@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.25)
 # Must come before project() and all targets.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-project(ACPReloaded VERSION 1.0.0 LANGUAGES C CXX)
+project(ACPReloaded VERSION 1.0.1 LANGUAGES C CXX)
 set(ACP_VERSION_LABEL "${PROJECT_VERSION}-beta")  # shown in the panel and the log
 
 if(NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)

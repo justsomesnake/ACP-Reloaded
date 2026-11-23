@@ -550,12 +550,12 @@ std::string UiSettings::Serialize() const {
                   "theme=%d\r\nscale=%.2f\r\nexpert=%d\r\ncustomFilter=%d\r\ngameFunctions=%d\r\nownClock=%d\r\ntoggleKey=%u\r\n"
                   "onlyInHackedSave=%d\r\nfpsLimit=%d\r\nbackgroundLimit=%d\r\nshowFps=%d\r\nshowFrameGraph=%d\r\nstatsCorner=%d\r\n"
                   "sharpen=%d\r\nfpsCustom=%d\r\nteleport=%d\r\ntpRange=%d\r\ntpAllowCombat=%d\r\ntpAllowMounted=%d\r\n"
-                  "swimBoost=%d\r\nmountBoost=%d\r\ntpQuick=%d\r\ntpQuickHotkey=%u\r\n",
+                  "swimBoost=%d\r\nmountBoost=%d\r\ntpQuick=%d\r\ntpQuickHotkey=%u\r\nhideWatermark=%d\r\n",
                   static_cast<int>(theme), scale, expert ? 1 : 0, customFilter ? 1 : 0, gameFunctions ? 1 : 0, ownClock ? 1 : 0,
                   static_cast<unsigned>(toggleKey), onlyInHackedSave ? 1 : 0, fpsLimit, backgroundLimit ? 1 : 0, showFps ? 1 : 0,
                   showFrameGraph ? 1 : 0, statsCorner, sharpen, fpsCustom ? 1 : 0, teleport ? 1 : 0, tpRange,
                   tpAllowCombat ? 1 : 0, tpAllowMounted ? 1 : 0, swimBoost, mountBoost, tpQuick ? 1 : 0,
-                  static_cast<unsigned>(tpQuickKey));
+                  static_cast<unsigned>(tpQuickKey), hideWatermark ? 1 : 0);
     return buf;
 }
 
@@ -592,6 +592,7 @@ UiSettings UiSettings::Parse(std::string_view text) {
         else if (k == "swimBoost") s.swimBoost = std::clamp(std::atoi(v.c_str()), 100, 400);
         else if (k == "mountBoost") s.mountBoost = std::clamp(std::atoi(v.c_str()), 100, 400);
         else if (k == "tpQuick") s.tpQuick = v == "1";
+        else if (k == "hideWatermark") s.hideWatermark = v == "1";
         else if (k == "tpQuickHotkey") {
             const unsigned long hk = std::strtoul(v.c_str(), nullptr, 10);
             if (hk <= 0x7FFFF) s.tpQuickKey = static_cast<std::uint32_t>(hk);  // 0 = controller only
@@ -2563,6 +2564,11 @@ void Panel::DrawSettings(const PanelEnv& env) {
         ImGui::SameLine();
         ImGui::TextDisabled("(%s)", settings_.gameFunctions ? env.game.stateText : "off");
         if (settings_.gameFunctions) {
+            if (LabeledToggle("Hide the ACP watermark (for screenshots)", &settings_.hideWatermark)) SaveSettings();
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Hides the faint ACP text the game shows in a 'Hacked Animus' save - in play and in photo mode.\n"
+                                  "Only changes how that text is drawn: achievements, saves and ACP values are not affected.\n"
+                                  "Turning it off (or unloading the overlay) brings the text back.");
             if (LabeledToggle("Teleport (experimental): to map marker or quest target", &settings_.teleport)) SaveSettings();
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Shows your custom map marker, its distance and whether a teleport would be allowed.\n"
